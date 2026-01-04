@@ -1,0 +1,41 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Editor & IDE Files
+.claude
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Rust - Server
+/server/target/
+**/target/
+**/*.rs.bk
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# Node.js / Frontend
+node_modules/
+npm-debug.log
+yarn-error.log
+*.log
+backend_log.txt
+dist/
+build/
+.next/
+
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
