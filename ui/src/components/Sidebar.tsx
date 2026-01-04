@@ -14,6 +14,7 @@ interface SidebarProps {
     onEventSelect: (event: Event) => void;
     onNearMeClick: () => void;
     isLoadingLocation: boolean;
+    isMobile?: boolean;
 }
 
 export default function Sidebar({
@@ -25,8 +26,10 @@ export default function Sidebar({
     onEventSelect,
     onNearMeClick,
     isLoadingLocation,
+    isMobile = false,
 }: SidebarProps) {
     const [showFilters, setShowFilters] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     // Get unique countries from ALL events
     const countries = [...new Set(
@@ -46,6 +49,98 @@ export default function Sidebar({
     const now = new Date();
     const upcomingCount = allEvents.filter(e => new Date(e.event_date) >= now).length;
     const pastCount = allEvents.filter(e => new Date(e.event_date) < now).length;
+
+    if (isMobile) {
+        return (
+            <div className="bg-[var(--color-surface)] border-t border-white/10 safe-area-bottom">
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="w-full flex items-center justify-center py-2"
+                >
+                    <div className="w-10 h-1 rounded-full bg-white/30" />
+                </button>
+
+                <div className={`transition-all duration-300 ease-out ${isExpanded ? 'max-h-[60vh]' : 'max-h-32'}`}>
+                    <div className="flex items-center justify-between px-4 pb-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-[var(--color-text)]">
+                                {events.length} Rides
+                            </span>
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="p-1.5 rounded-md bg-[var(--color-surface-light)] text-[var(--color-text-muted)]"
+                            >
+                                <SlidersHorizontal className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="p-1.5 rounded-md bg-[var(--color-surface-light)] text-[var(--color-text-muted)]"
+                        >
+                            {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                        </button>
+                    </div>
+
+                    {showFilters && (
+                        <div className="px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
+                            <button
+                                onClick={() => onFilterChange({ timeFilter: 'upcoming' })}
+                                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${
+                                    filters.timeFilter === 'upcoming'
+                                        ? 'bg-[var(--color-primary)] text-white'
+                                        : 'bg-[var(--color-surface-light)] text-[var(--color-text-muted)]'
+                                }`}
+                            >
+                                Upcoming ({upcomingCount})
+                            </button>
+                            <button
+                                onClick={() => onFilterChange({ timeFilter: 'past' })}
+                                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${
+                                    filters.timeFilter === 'past'
+                                        ? 'bg-[var(--color-primary)] text-white'
+                                        : 'bg-[var(--color-surface-light)] text-[var(--color-text-muted)]'
+                                }`}
+                            >
+                                Past ({pastCount})
+                            </button>
+                            <button
+                                onClick={onNearMeClick}
+                                disabled={isLoadingLocation}
+                                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 ${
+                                    filters.sortByDistance
+                                        ? 'bg-[var(--color-accent)] text-white'
+                                        : 'bg-[var(--color-surface-light)] text-[var(--color-text-muted)]'
+                                }`}
+                            >
+                                {isLoadingLocation ? <Loader2 className="w-3 h-3 animate-spin" /> : <MapPin className="w-3 h-3" />}
+                                Near Me
+                            </button>
+                        </div>
+                    )}
+
+                    <div className={`overflow-x-auto scrollbar-hide ${isExpanded ? 'overflow-y-auto' : ''}`}>
+                        <div className={`flex gap-3 px-4 pb-4 ${isExpanded ? 'flex-col' : 'flex-row'}`}>
+                            {events.length === 0 ? (
+                                <div className="flex-shrink-0 w-full text-center py-4 text-[var(--color-text-muted)] text-sm">
+                                    No events found
+                                </div>
+                            ) : (
+                                events.map((event) => (
+                                    <EventCard
+                                        key={event.id}
+                                        event={event}
+                                        isSelected={event.id === selectedEventId}
+                                        onClick={() => onEventSelect(event)}
+                                        compact={!isExpanded}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <aside className="flex flex-col h-full bg-[var(--color-surface)] border-r border-white/5">
