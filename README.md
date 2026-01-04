@@ -32,6 +32,34 @@ npm run dev
 
 ---
 
+## Scripts
+
+### Server (Rust)
+
+```bash
+cd server
+
+cargo run                    # Development server (port 3001)
+cargo build --release        # Production build
+cargo check                  # Check for errors
+cargo clippy                 # Run linter
+cargo fmt                    # Format code
+cargo test                   # Run tests
+```
+
+### UI (Next.js)
+
+```bash
+cd ui
+
+npm run dev                  # Development server (port 3000)
+npm run build                # Production build
+npm start                    # Start production server
+npm run lint                 # Run ESLint
+```
+
+---
+
 ## Architecture
 
 The project is a monorepo-style structure:
