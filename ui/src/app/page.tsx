@@ -209,11 +209,11 @@ export default function HomePage() {
       <Header onAddEventClick={() => setShowAddEventModal(true)} />
 
       <main
-        className="flex-1 flex flex-col md:flex-row overflow-hidden"
+        className="flex-1 flex flex-col md:flex-row overflow-hidden relative"
         style={{ marginTop: 'var(--header-height)' }}
       >
-        {/* Sidebar - Events List */}
-        <div className="w-full md:w-[var(--sidebar-width)] flex-shrink-0 h-[45vh] md:h-full overflow-hidden">
+        {/* Desktop: Sidebar on left */}
+        <div className="hidden md:block md:w-[var(--sidebar-width)] flex-shrink-0 md:h-full overflow-hidden">
           <Sidebar
             events={filteredEvents}
             allEvents={events}
@@ -226,8 +226,8 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Map */}
-        <div className="flex-1 relative h-[55vh] md:h-full">
+        {/* Map - full height on mobile, flex-1 on desktop */}
+        <div className="flex-1 relative h-full">
           <Map
             events={filteredEvents}
             selectedEventId={selectedEventId}
@@ -235,6 +235,21 @@ export default function HomePage() {
             userLocation={filters.userLocation}
           />
           <Footer />
+        </div>
+
+        {/* Mobile: Bottom sheet with events */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-30">
+          <Sidebar
+            events={filteredEvents}
+            allEvents={events}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            selectedEventId={selectedEventId}
+            onEventSelect={handleEventSelect}
+            onNearMeClick={handleNearMe}
+            isLoadingLocation={isLoadingLocation}
+            isMobile={true}
+          />
         </div>
       </main>
 
