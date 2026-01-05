@@ -1,104 +1,17 @@
 use sqlx::SqlitePool;
 
-/// Initialize database with required tables
-pub async fn init_db(pool: &SqlitePool) -> anyhow::Result<()> {
-    // Create organizers table first
-    sqlx::query(
-        r#"
-        CREATE TABLE IF NOT EXISTS organizers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            slug TEXT NOT NULL UNIQUE,
-            description TEXT,
-            website TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-        "#,
-    )
-    .execute(pool)
-    .await?;
-
-    // Create events table with optional organizer_id FK
-    sqlx::query(
-        r#"
-        CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT,
-            organizer TEXT NOT NULL,
-            organizer_id INTEGER REFERENCES organizers(id),
-            location_name TEXT NOT NULL,
-            country TEXT,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
-            event_date DATETIME NOT NULL,
-            image_url TEXT,
-            video_url TEXT,
-            event_link TEXT,
-            status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-        "#,
-    )
-    .execute(pool)
-    .await?;
-
-    // Create indexes for common queries
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date)")
-        .execute(pool)
-        .await?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_events_status ON events(status)")
-        .execute(pool)
-        .await?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_events_organizer_id ON events(organizer_id)")
-        .execute(pool)
-        .await?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_organizers_slug ON organizers(slug)")
-        .execute(pool)
-        .await?;
-
-    // Create video suggestions table
-    sqlx::query(
-        r#"
-        CREATE TABLE IF NOT EXISTS video_suggestions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            event_id INTEGER NOT NULL REFERENCES events(id),
-            video_url TEXT NOT NULL,
-            status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-        "#,
-    )
-    .execute(pool)
-    .await?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_suggestions_status ON video_suggestions(status)")
-        .execute(pool)
-        .await?;
-
-    sqlx::query("CREATE INDEX IF NOT EXISTS idx_suggestions_event ON video_suggestions(event_id)")
-        .execute(pool)
-        .await?;
-
-    // Seed if empty
+/// Add sample organizers and events for development/demo
+pub async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
     let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM events")
         .fetch_one(pool)
         .await?;
 
-    if count.0 == 0 {
-        seed_sample_data(pool).await?;
+    if count.0 > 0 {
+        return Ok(());
     }
 
-    tracing::info!("Database initialized successfully");
-    Ok(())
-}
+    tracing::info!("Seeding database with sample data...");
 
-/// Add sample organizers and events for development/demo
-async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
-    // Insert organizers
     let organizers = vec![
         (
             "Dom Whiting",
@@ -126,7 +39,6 @@ async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
             .await?;
     }
 
-    // Get organizer IDs
     let dom_id: Option<(i64,)> =
         sqlx::query_as("SELECT id FROM organizers WHERE slug = 'dom-whiting'")
             .fetch_optional(pool)
@@ -144,7 +56,6 @@ async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
     let nh_id = nh_id.map(|x| x.0);
     let berlin_id = berlin_id.map(|x| x.0);
 
-    // (title, desc, organizer_name, organizer_id, location, country, lat, lng, date, status, video_url, event_link)
     let sample_events: Vec<(
         &str,
         &str,
@@ -159,6 +70,7 @@ async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
         Option<&str>,
         Option<&str>,
     )> = vec![
+        // FUTURE / UPCOMING EVENTS (Sample Data)
         (
             "London DNB On Bike - Spring Edition",
             "Join Dom Whiting for the original DNB On Bike experience through London streets!",
@@ -216,20 +128,6 @@ async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
             None,
         ),
         (
-            "Brighton Beach Beats",
-            "Seaside drum and bass cycling adventure.",
-            "Dom Whiting",
-            dom_id,
-            "Brighton",
-            "United Kingdom",
-            50.8225,
-            -0.1372,
-            "2025-08-20 12:00:00",
-            "approved",
-            Some("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
-            None,
-        ),
-        (
             "Berlin Bass Fahrt",
             "Drum and Bass bike ride through Berlin!",
             "Berlin DNB Crew",
@@ -242,6 +140,231 @@ async fn seed_sample_data(pool: &SqlitePool) -> anyhow::Result<()> {
             "pending",
             None,
             None,
+        ),
+        // PAST EVENTS (Historical Data from Dom Whiting)
+        (
+            "DnB On The Bike - LONDON NIGHT RIDE",
+            "Winter night ride special through the capital.",
+            "Dom Whiting",
+            dom_id,
+            "London",
+            "United Kingdom",
+            51.5074,
+            -0.1278,
+            "2025-12-05 19:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=9k2CnY5rCzM"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - MADRID",
+            "First major ride in the Spanish capital!",
+            "Dom Whiting",
+            dom_id,
+            "Madrid",
+            "Spain",
+            40.4168,
+            -3.7038,
+            "2025-11-02 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=ZZTMbYrKkjM"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BARCELONA",
+            "Returning to the sunny streets of BCN.",
+            "Dom Whiting",
+            dom_id,
+            "Barcelona",
+            "Spain",
+            41.3851,
+            2.1734,
+            "2025-10-23 15:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=2mGe3kYjbUQ"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - MANCHESTER",
+            "Piccadilly Gardens start for the northern crew.",
+            "Dom Whiting",
+            dom_id,
+            "Manchester",
+            "United Kingdom",
+            53.4808,
+            -2.2426,
+            "2025-10-09 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=WO94Xcpr7Kk"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - DUBLIN",
+            "Double header in Ireland!",
+            "Dom Whiting",
+            dom_id,
+            "Dublin",
+            "Ireland",
+            53.3498,
+            -6.2603,
+            "2025-10-02 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=dE92aORpcWU"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BRIGHTON",
+            "Seaside vibes returning to Brighton.",
+            "Dom Whiting",
+            dom_id,
+            "Brighton",
+            "United Kingdom",
+            50.8225,
+            -0.1372,
+            "2025-09-15 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=vu8CjMmatKk"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - CARDIFF",
+            "Rolling through the Welsh capital.",
+            "Dom Whiting",
+            dom_id,
+            "Cardiff",
+            "United Kingdom",
+            51.4816,
+            -3.1791,
+            "2025-09-22 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=c6-_V2IJJ9g"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BIRMINGHAM",
+            "Summer vibes in Brum.",
+            "Dom Whiting",
+            dom_id,
+            "Birmingham",
+            "United Kingdom",
+            52.4862,
+            -1.8904,
+            "2025-07-20 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=W9uv6U794yA"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BERLIN",
+            "Techno city meets Drum & Bass.",
+            "Dom Whiting",
+            dom_id,
+            "Berlin",
+            "Germany",
+            52.5200,
+            13.4050,
+            "2025-06-22 14:00:00",
+            "approved",
+            Some("https://www.youtube.com/watch?v=KKqS5_dOF2k"),
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BRISTOL",
+            "The spiritual home of UK DnB.",
+            "Dom Whiting",
+            dom_id,
+            "Bristol",
+            "United Kingdom",
+            51.4545,
+            -2.5879,
+            "2025-06-08 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - VIENNA",
+            "Austrian debut ride!",
+            "Dom Whiting",
+            dom_id,
+            "Vienna",
+            "Austria",
+            48.2082,
+            16.3738,
+            "2025-05-18 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - OXFORD",
+            "Riding through the dreaming spires.",
+            "Dom Whiting",
+            dom_id,
+            "Oxford",
+            "United Kingdom",
+            51.7520,
+            -1.2577,
+            "2025-05-04 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - ADELAIDE",
+            "Down under tour continues.",
+            "Dom Whiting",
+            dom_id,
+            "Adelaide",
+            "Australia",
+            -34.9285,
+            138.6007,
+            "2025-03-16 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BERLIN (Marathon Warmup)",
+            "Winter ride in Berlin.",
+            "Dom Whiting",
+            dom_id,
+            "Berlin",
+            "Germany",
+            52.5200,
+            13.4050,
+            "2024-12-17 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - BOURNEMOUTH",
+            "Winter session by the sea.",
+            "Dom Whiting",
+            dom_id,
+            "Bournemouth",
+            "United Kingdom",
+            50.7192,
+            -1.8808,
+            "2024-12-06 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
+        ),
+        (
+            "DnB On The Bike - FRANKFURT",
+            "German summer tour stop.",
+            "Dom Whiting",
+            dom_id,
+            "Frankfurt",
+            "Germany",
+            50.1109,
+            8.6821,
+            "2024-07-19 14:00:00",
+            "approved",
+            None,
+            Some("https://www.facebook.com/domwhiting/events"),
         ),
     ];
 

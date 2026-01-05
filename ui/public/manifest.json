@@ -1,11 +1,11 @@
 {
-    "name": "DnB On The Bike",
-    "short_name": "DnB On The Bike",
+    "name": "DNBRIDE",
+    "short_name": "DNBRIDE",
     "description": "Discover Drum & Bass cycling events worldwide",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#0f1419",
-    "theme_color": "#ff3b5c",
+    "background_color": "#0A1929",
+    "theme_color": "#FF6B6B",
     "orientation": "portrait-primary",
     "icons": [
         {

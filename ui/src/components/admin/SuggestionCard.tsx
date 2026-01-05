@@ -1,6 +1,7 @@
 'use client';
 
 import { VideoSuggestion } from '@/types';
+import { Video, Check, X, ExternalLink } from 'lucide-react';
 
 interface SuggestionCardProps {
     suggestion: VideoSuggestion;
@@ -22,55 +23,62 @@ export default function SuggestionCard({
     });
 
     return (
-        <article className="glass rounded-xl p-5 animate-fade-in">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-3">
-                <h3 className="text-lg font-semibold text-[var(--color-text)]">
-                    Suggestion for: {suggestion.event_title || `Event #${suggestion.event_id}`}
-                </h3>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase bg-yellow-500/20 text-yellow-400">
+        <article className="glass-aurora rounded-3xl p-5 animate-fade-in">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--aurora-purple)]/20 flex items-center justify-center">
+                        <Video className="w-5 h-5 text-[var(--aurora-purple)]" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-[var(--color-text)]">
+                            {suggestion.event_title || `Event #${suggestion.event_id}`}
+                        </h3>
+                        <p className="text-sm text-[var(--color-text-muted)]">
+                            Submitted: {createdDate}
+                        </p>
+                    </div>
+                </div>
+                <span className="px-3 py-1.5 rounded-full text-xs font-semibold uppercase bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                     Pending
                 </span>
             </div>
 
-            {/* Meta */}
-            <div className="text-sm text-[var(--color-text-muted)] mb-4">
-                Submitted: {createdDate}
-            </div>
-
-            {/* Video URL */}
             <div className="mb-4">
-                <input
-                    type="text"
-                    value={suggestion.video_url}
-                    readOnly
-                    onClick={(e) => (e.target as HTMLInputElement).select()}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--color-background)]/50 border border-white/10 text-[var(--color-text)] text-sm cursor-pointer"
-                />
-                <a
-                    href={suggestion.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-2 text-sm text-[var(--color-accent)] hover:underline"
-                >
-                    Test Link →
-                </a>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={suggestion.video_url}
+                        readOnly
+                        onClick={(e) => (e.target as HTMLInputElement).select()}
+                        className="flex-1 px-4 py-3 input-aurora cursor-pointer text-sm"
+                    />
+                    <a
+                        href={suggestion.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl border border-white/20 hover:bg-white/5 text-[var(--color-text-muted)] text-sm transition-colors"
+                    >
+                        <ExternalLink className="w-4 h-4" />
+                        Test
+                    </a>
+                </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-2 justify-end">
                 <button
                     onClick={onApprove}
                     disabled={isLoading}
-                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--aurora-emerald)] hover:brightness-110 text-white text-sm font-medium transition-all disabled:opacity-50"
                 >
+                    <Check className="w-4 h-4" />
                     Approve & Update Event
                 </button>
                 <button
                     onClick={onReject}
                     disabled={isLoading}
-                    className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-500 hover:brightness-110 text-white text-sm font-medium transition-all disabled:opacity-50"
                 >
+                    <X className="w-4 h-4" />
                     Reject
                 </button>
             </div>

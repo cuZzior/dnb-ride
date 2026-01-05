@@ -1,33 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  /* DNB On Bike - Vibrant Modern Palette */
-  --color-primary: #ff3b5c;
-  --color-primary-dark: #e6294a;
-  --color-primary-light: #ff6b8a;
-  --color-accent: #00d4ff;
-  --color-accent-dark: #00a8cc;
-  --color-accent-light: #5ce1ff;
-
-  /* Backgrounds - lighter, more vibrant */
-  --color-background: #0f1419;
-  --color-surface: #1a2332;
-  --color-surface-light: #243447;
-  --color-surface-glass: rgba(26, 35, 50, 0.85);
-
+  /* ========== DNBRIDE AURORA FLOW 2026 ========== */
+  
+  /* Background - Deep Ocean */
+  --color-background: #0A1929;
+  
+  /* Primary Accent - Hot Coral */
+  --color-primary: #FF6B6B;
+  --color-primary-dark: #E85555;
+  --color-primary-light: #FF8E8E;
+  
+  /* Secondary Accent (preserved for compatibility) */
+  --color-accent: #50C878;
+  --color-accent-dark: #3da860;
+  --color-accent-light: #6fd993;
+  
+  /* Aurora Gradient Colors */
+  --aurora-emerald: #50C878;
+  --aurora-blue: #4169E1;
+  --aurora-purple: #9D4EDD;
+  
+  /* Surfaces - Enhanced Glass */
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-light: rgba(255, 255, 255, 0.08);
+  --color-surface-glass: rgba(255, 255, 255, 0.06);
+  
   /* Text */
-  --color-text: #ffffff;
-  --color-text-muted: #94a3b8;
-
+  --color-text: #FFFFFF;
+  --color-text-muted: #A0AAB5;
+  
   /* Status colors */
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
-
+  
+  /* 2026 Radii */
+  --radius-card: 24px;
+  --radius-button: 50px;
+  --radius-input: 16px;
+  
   /* Spacing */
   --header-height: 64px;
-  --sidebar-width: 400px;
-
+  --sidebar-width: 420px;
+  
   /* Safe areas for PWA */
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -35,9 +51,9 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
-/* Fonts */
+/* ========== TYPOGRAPHY ========== */
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
 }
 
 * {
@@ -65,15 +81,80 @@ body {
   }
 }
 
-/* Glassmorphism utility */
+/* ========== AURORA BACKGROUND BLOBS ========== */
+@keyframes aurora-float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+  }
+  33% { 
+    transform: translate(30px, -50px) scale(1.1); 
+  }
+  66% { 
+    transform: translate(-20px, 40px) scale(0.9); 
+  }
+}
+
+.aurora-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.35;
+  animation: aurora-float 25s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob--emerald {
+  background: var(--aurora-emerald);
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: -150px;
+}
+
+.aurora-blob--blue {
+  background: var(--aurora-blue);
+  width: 550px;
+  height: 550px;
+  bottom: -180px;
+  right: -120px;
+  animation-delay: -8s;
+}
+
+.aurora-blob--purple {
+  background: var(--aurora-purple);
+  width: 450px;
+  height: 450px;
+  top: 40%;
+  left: 55%;
+  animation-delay: -16s;
+}
+
+/* ========== GLASSMORPHISM V2 ========== */
 .glass {
-  background: var(--color-surface-glass);
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-aurora {
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+}
+
+.glass-aurora-light {
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Custom scrollbar */
+/* ========== CUSTOM SCROLLBAR ========== */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -83,20 +164,20 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-surface-light);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
+  background: var(--color-primary);
 }
 
-/* Smooth transitions */
+/* ========== TRANSITIONS ========== */
 button,
 a,
 input,
 select {
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Focus states */
@@ -104,42 +185,121 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Gradient text utility */
+/* ========== GRADIENT TEXT ========== */
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--aurora-purple) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Gradient button */
+/* ========== BUTTONS ========== */
 .btn-gradient {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   border: none;
   color: white;
   font-weight: 600;
+  border-radius: var(--radius-button);
 }
 
 .btn-gradient:hover {
   background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(255, 59, 92, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
 }
 
-/* Animation keyframes */
-@keyframes pulse-glow {
+.btn-coral {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  box-shadow: 0 0 24px rgba(255, 107, 107, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 59, 92, 0.4);
+.btn-coral:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(255, 107, 107, 0.5);
+}
+
+.btn-coral:active {
+  transform: translateY(0);
+}
+
+/* ========== BADGE ========== */
+.badge-aurora {
+  background: linear-gradient(135deg, var(--aurora-purple) 0%, var(--aurora-blue) 100%);
+  color: white;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* ========== CARD HOVER ========== */
+.card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.card-aurora {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-aurora:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== PULSING MARKER ========== */
+@keyframes marker-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
   }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
 
+.marker-dot {
+  width: 14px;
+  height: 14px;
+  background: var(--color-primary);
+  border: 2px solid white;
+  border-radius: 50%;
+  position: relative;
+}
+
+.marker-dot::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  opacity: 0.5;
+  animation: marker-pulse 2s ease-out infinite;
+}
+
+/* ========== ANIMATION KEYFRAMES ========== */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+  }
   50% {
-    box-shadow: 0 0 0 12px rgba(255, 59, 92, 0);
+    box-shadow: 0 0 0 12px rgba(255, 107, 107, 0);
   }
 }
 
@@ -148,7 +308,6 @@ select:focus-visible {
     opacity: 0;
     transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -160,7 +319,6 @@ select:focus-visible {
     opacity: 0;
     transform: translateY(16px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -171,9 +329,19 @@ select:focus-visible {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -193,30 +361,47 @@ select:focus-visible {
   animation: spin 1s linear infinite;
 }
 
-/* Mobile optimizations */
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* ========== VAUL DRAWER OVERRIDES ========== */
+[vaul-drawer] {
+  background: transparent !important;
+}
+
+[vaul-drawer][vaul-drawer-direction="bottom"] > [vaul-drawer-content] {
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+}
+
+[vaul-handle] {
+  background: rgba(255, 255, 255, 0.3) !important;
+  width: 48px !important;
+  height: 5px !important;
+  border-radius: 3px !important;
+}
+
+/* ========== MOBILE OPTIMIZATIONS ========== */
 @media (max-width: 768px) {
   :root {
     --header-height: 56px;
     --sidebar-width: 100%;
   }
 
-  .glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  .glass,
+  .glass-aurora {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  
+  .aurora-blob {
+    opacity: 0.25;
+    filter: blur(80px);
   }
 }
 
-/* Card hover effect */
-.card-hover {
-  transition: all 0.2s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  border-color: var(--color-accent) !important;
-}
-
+/* ========== UTILITY CLASSES ========== */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -230,17 +415,25 @@ select:focus-visible {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+/* Input Aurora Style */
+.input-aurora {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-input);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.input-aurora:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+  outline: none;
+}
+
+.input-aurora::placeholder {
+  color: rgba(160, 170, 181, 0.6);
 }

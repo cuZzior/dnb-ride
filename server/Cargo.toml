@@ -1,5 +1,5 @@
 [package]
-name = "dnb-on-bike-api"
+name = "dnb-ride-api"
 version = "0.1.0"
 edition = "2021"
 
@@ -14,7 +14,12 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 # Database
-sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "chrono"] }
+sqlx = { version = "0.7", features = [
+  "runtime-tokio",
+  "sqlite",
+  "chrono",
+  "migrate",
+] }
 
 # Date/time
 chrono = { version = "0.4", features = ["serde"] }
