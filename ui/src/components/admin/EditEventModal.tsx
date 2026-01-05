@@ -23,6 +23,7 @@ export default function EditEventModal({ event, adminKey, onClose, onSuccess }: 
     const [latitude, setLatitude] = useState(event.latitude.toString());
     const [longitude, setLongitude] = useState(event.longitude.toString());
     const [description, setDescription] = useState(event.description || '');
+    const [imageUrl, setImageUrl] = useState(event.image_url || '');
     const [videoUrl, setVideoUrl] = useState(event.video_url || '');
     const [eventLink, setEventLink] = useState(event.event_link || '');
     const [status, setStatus] = useState(event.status);
@@ -44,9 +45,10 @@ export default function EditEventModal({ event, adminKey, onClose, onSuccess }: 
                 country: country || null,
                 latitude: parseFloat(latitude),
                 longitude: parseFloat(longitude),
-                description: description || null,
-                video_url: videoUrl || null,
-                event_link: eventLink || null,
+                description: description || '',
+                image_url: imageUrl || '',
+                video_url: videoUrl || '',
+                event_link: eventLink || '',
                 event_date: new Date(`${date}T${time}:00`).toISOString(),
                 status,
             });
@@ -57,7 +59,7 @@ export default function EditEventModal({ event, adminKey, onClose, onSuccess }: 
         } finally {
             setIsSubmitting(false);
         }
-    }, [adminKey, event.id, title, organizer, locationName, country, latitude, longitude, description, videoUrl, eventLink, date, time, status, onSuccess, onClose]);
+    }, [adminKey, event.id, title, organizer, locationName, country, latitude, longitude, description, imageUrl, videoUrl, eventLink, date, time, status, onSuccess, onClose]);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
@@ -181,25 +183,72 @@ export default function EditEventModal({ event, adminKey, onClose, onSuccess }: 
                     </div>
 
                     <div>
+                        <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">Image URL</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="url"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                                placeholder="https://..."
+                                className="flex-1 px-4 py-3 input-aurora"
+                            />
+                            {imageUrl && (
+                                <button
+                                    type="button"
+                                    onClick={() => setImageUrl('')}
+                                    className="px-3 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors"
+                                    title="Clear"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div>
                         <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">YouTube URL</label>
-                        <input
-                            type="url"
-                            value={videoUrl}
-                            onChange={(e) => setVideoUrl(e.target.value)}
-                            placeholder="https://youtube.com/watch?v=..."
-                            className="w-full px-4 py-3 input-aurora"
-                        />
+                        <div className="flex gap-2">
+                            <input
+                                type="url"
+                                value={videoUrl}
+                                onChange={(e) => setVideoUrl(e.target.value)}
+                                placeholder="https://youtube.com/watch?v=..."
+                                className="flex-1 px-4 py-3 input-aurora"
+                            />
+                            {videoUrl && (
+                                <button
+                                    type="button"
+                                    onClick={() => setVideoUrl('')}
+                                    className="px-3 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors"
+                                    title="Clear"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div>
                         <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">Event Link</label>
-                        <input
-                            type="url"
-                            value={eventLink}
-                            onChange={(e) => setEventLink(e.target.value)}
-                            placeholder="https://facebook.com/events/..."
-                            className="w-full px-4 py-3 input-aurora"
-                        />
+                        <div className="flex gap-2">
+                            <input
+                                type="url"
+                                value={eventLink}
+                                onChange={(e) => setEventLink(e.target.value)}
+                                placeholder="https://facebook.com/events/..."
+                                className="flex-1 px-4 py-3 input-aurora"
+                            />
+                            {eventLink && (
+                                <button
+                                    type="button"
+                                    onClick={() => setEventLink('')}
+                                    className="px-3 py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors"
+                                    title="Clear"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div>

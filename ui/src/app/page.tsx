@@ -129,7 +129,13 @@ export default function HomePage() {
       },
       (error) => {
         console.error('Geolocation error:', error);
-        alert('Error getting location: ' + error.message);
+        let msg = 'Error getting location.';
+        if (error.code === 1) msg += ' Permission denied.';
+        else if (error.code === 2) msg += ' Position unavailable.';
+        else if (error.code === 3) msg += ' Timeout.';
+        else if (window.isSecureContext === false) msg += ' Geolocation requires HTTPS.';
+        
+        alert(msg);
         setIsLoadingLocation(false);
       },
       {

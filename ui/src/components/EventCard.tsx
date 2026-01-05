@@ -83,8 +83,8 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
             onClick={onClick}
         >
             <div className="flex gap-3">
-                {event.image_url && (
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+                    {event.image_url ? (
                         <Image
                             src={event.image_url}
                             alt={event.title}
@@ -92,13 +92,12 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
                             className="object-cover"
                             sizes="56px"
                         />
-                        {event.video_url && (
-                            <div className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                                <Play className="w-2.5 h-2.5 text-white fill-white" />
-                            </div>
-                        )}
-                    </div>
-                )}
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--aurora-purple)]/20">
+                            <Calendar className="w-5 h-5 text-[var(--color-text-muted)]" />
+                        </div>
+                    )}
+                </div>
 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-1">
@@ -106,15 +105,15 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
                             {event.title}
                         </h3>
                         <div className="flex items-center gap-1 flex-shrink-0">
+                            {event.video_url && (
+                                <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
+                                </div>
+                            )}
                             {isPast && (
                                 <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] text-[var(--color-text-muted)]">
                                     Past
                                 </span>
-                            )}
-                            {event.video_url && !event.image_url && (
-                                <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
-                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
-                                </div>
                             )}
                         </div>
                     </div>

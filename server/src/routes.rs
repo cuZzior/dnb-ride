@@ -328,7 +328,7 @@ async fn update_event(
         q = q.bind(v);
     }
     if let Some(ref v) = payload.description {
-        q = q.bind(v);
+        q = q.bind(if v.is_empty() { None::<String> } else { Some(v.clone()) });
     }
     if let Some(ref v) = payload.organizer {
         q = q.bind(v);
@@ -337,7 +337,7 @@ async fn update_event(
         q = q.bind(v);
     }
     if let Some(ref v) = payload.country {
-        q = q.bind(v);
+        q = q.bind(if v.is_empty() { None::<String> } else { Some(v.clone()) });
     }
     if let Some(v) = payload.latitude {
         q = q.bind(v);
@@ -349,13 +349,13 @@ async fn update_event(
         q = q.bind(v);
     }
     if let Some(ref v) = payload.image_url {
-        q = q.bind(v);
+        q = q.bind(if v.is_empty() { None::<String> } else { Some(v.clone()) });
     }
     if let Some(ref v) = payload.video_url {
-        q = q.bind(v);
+        q = q.bind(if v.is_empty() { None::<String> } else { Some(v.clone()) });
     }
     if let Some(ref v) = payload.event_link {
-        q = q.bind(v);
+        q = q.bind(if v.is_empty() { None::<String> } else { Some(v.clone()) });
     }
     if let Some(ref v) = payload.status {
         q = q.bind(v);
