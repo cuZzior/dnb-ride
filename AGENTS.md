@@ -12,45 +12,32 @@ This document provides conventions and commands for AI agents working in this co
 ## Build & Run Commands
 
 ### Server (Rust)
+Working directory: `/server`
 
 ```bash
-cd server
-
-# Development
-cargo run                    # Start dev server (port 3001)
-cargo check                  # Type check without building
+cargo check                  # Quick type check
 cargo build                  # Build debug binary
-cargo build --release        # Build production binary
-
-# Linting & Formatting
-cargo clippy                 # Run linter (fix all warnings)
+cargo clippy                 # Linting (fix all warnings)
 cargo fmt                    # Format code
-cargo fmt -- --check         # Check formatting without changing
 
 # Testing
-cargo test                   # Run all tests
-cargo test <test_name>       # Run single test by name
+cargo test                   # Run all unit tests
+cargo test <test_name>       # Run a specific test (e.g., cargo test validation)
 cargo test -- --nocapture    # Run tests with stdout visible
 ```
 
 ### UI (Next.js)
+Working directory: `/ui`
 
 ```bash
-cd ui
-
-# Development
 npm install                  # Install dependencies
 npm run dev                  # Start dev server (port 3000)
-npm run build                # Production build
-npm start                    # Start production server
-
-# Linting
 npm run lint                 # Run ESLint
+npm run build                # Production build
 ```
 
 ### Full Stack Development
-
-Run both services (in separate terminals):
+Run both services in separate terminals:
 ```bash
 # Terminal 1: Server
 cd server && cargo run
@@ -59,173 +46,32 @@ cd server && cargo run
 cd ui && npm run dev
 ```
 
-## Environment Variables
-
-**Never commit .env files.** They are gitignored.
-
-### Server: `server/.env`
-```env
-DATABASE_URL=sqlite:dnb_events.db?mode=rwc
-ADMIN_API_KEY=your-secure-secret-key    # REQUIRED
-PORT=3001
-ALLOWED_ORIGIN=http://localhost:3000
-```
-
-### UI: `ui/.env.local`
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
-NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_token  # REQUIRED
-```
-
 ---
 
 ## Code Style - Rust (Server)
 
-### Imports
-Group imports in order: std, external crates, local modules.
-```rust
-use std::sync::Arc;
+### 1. Architecture & Patterns
+- **Framework**: Axum 0.7 + Tokio
+- **Database**: SQLite via SQLx (raw SQL queries preferred over ORM)
+- **Error Handling**: Return `Result<Json<T>, StatusCode>`. Use `?` for propagation.
+  - Map errors: `.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?`
+  - 404s: `.ok_or(StatusCode::NOT_FOUND)?`
+- **Nullable Fields**: Use `Option<String>` for nullable columns.
+  - **IMPORTANT**: For `UpdateEventRequest`, optional URL fields (`image_url`, etc.) accept empty strings `""` to clear the value (convert to `NULL` in DB). Do NOT use `#[validate(url)]` on these updatable fields to allow clearing.
 
-use axum::{extract::State, Json, Router};
-use sqlx::SqlitePool;
-
-use crate::models::Event;
-use crate::AppState;
-```
-
-### Naming
-- **Types/Structs**: `PascalCase` - `EventsResponse`, `CreateEventRequest`
-- **Functions**: `snake_case` - `list_events`, `check_admin_auth`
-- **Constants**: `SCREAMING_SNAKE_CASE`
-- **Modules**: `snake_case` - `db.rs`, `routes.rs`, `models.rs`
-
-### Error Handling
-- Use `anyhow::Result` for application errors in main/init
-- Return `Result<T, StatusCode>` from route handlers
-- Map errors with `.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?`
-- Use `?` operator for propagation
-
-```rust
-async fn get_event(...) -> Result<Json<Event>, StatusCode> {
-    let event: Event = sqlx::query_as("SELECT ...")
-        .bind(id)
-        .fetch_optional(&state.db)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-        .ok_or(StatusCode::NOT_FOUND)?;
-    
-    Ok(Json(event))
-}
-```
-
-### Structs & Derives
-Standard derive order: `Debug, Clone, Serialize, Deserialize, FromRow`
-```rust
-#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
-pub struct Event {
-    pub id: i64,
-    pub title: String,
-    // ...
-}
-```
-
-### Validation
-Use `validator` crate with derive macros:
+### 2. Validation
+Use `validator` crate.
 ```rust
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateEventRequest {
     #[validate(length(min = 3))]
     pub title: String,
-    #[validate(url)]
+    #[validate(url)] // Only for creation, not update if clearing is needed
     pub image_url: Option<String>,
 }
 ```
 
-### SQL Queries
-- Use raw string literals `r#"..."#` for multi-line SQL
-- Always bind parameters with `.bind()` - never interpolate
-- Use `query_as` for typed results, `query` for writes
-
----
-
-## Code Style - TypeScript (UI)
-
-### Imports
-Order: React, external libs, local components, local utils, types.
-```typescript
-'use client';
-
-import { useEffect, useState, useMemo } from 'react';
-import dynamic from 'next/dynamic';
-import { MapPin, Clock } from 'lucide-react';
-
-import { Header, Sidebar, Footer } from '@/components';
-import { fetchEvents } from '@/lib/api';
-import { Event, Filters } from '@/types';
-```
-
-### Naming
-- **Components**: `PascalCase` - `EventCard.tsx`, `SuggestVideoModal.tsx`
-- **Hooks/Functions**: `camelCase` - `fetchEvents`, `handleFilterChange`
-- **Types/Interfaces**: `PascalCase` - `Event`, `Filters`
-- **Files**: `PascalCase` for components, `camelCase` for utilities
-
-### Component Structure
-```typescript
-interface ComponentProps {
-    event: Event;
-    onClick?: () => void;
-    isSelected?: boolean;
-}
-
-export default function EventCard({ event, onClick, isSelected }: ComponentProps) {
-    // Hooks first
-    const [state, setState] = useState<string>('');
-    
-    // Memoized values
-    const computed = useMemo(() => /* ... */, [deps]);
-    
-    // Callbacks
-    const handleClick = useCallback(() => /* ... */, [deps]);
-    
-    // Effects last before return
-    useEffect(() => { /* ... */ }, []);
-    
-    return (/* JSX */);
-}
-```
-
-### Types
-- Define interfaces in `src/types/index.ts`
-- Use `null` for nullable API fields: `description: string | null`
-- Use `undefined` for optional props: `onClick?: () => void`
-- Export response types: `EventsResponse`, `OrganizersResponse`
-
-### API Functions
-```typescript
-export async function fetchEvents(): Promise<Event[]> {
-    const res = await fetch(`${API_BASE}/events`);
-    if (!res.ok) throw new Error('Failed to fetch events');
-    const data: EventsResponse = await res.json();
-    return data.events;
-}
-```
-
-### Styling
-- Use Tailwind CSS with CSS variables for theming
-- CSS variables defined in `globals.css`: `var(--color-primary)`, `var(--color-surface)`
-- Glassmorphism pattern: `bg-[var(--color-surface-light)] backdrop-blur`
-
----
-
-## Key Patterns
-
-### State Management (UI)
-- React hooks for local state
-- Props drilling for component communication
-- No external state library
-
-### Route Handler Pattern (Server)
+### 3. Route Handler Pattern
 ```rust
 pub fn events_router() -> Router<Arc<AppState>> {
     Router::new()
@@ -240,15 +86,62 @@ async fn list_events(
 }
 ```
 
-### Admin Auth (Server)
+### 4. Admin Auth
 Admin routes require `X-Admin-Key` header matching `ADMIN_API_KEY` env var.
+Use `check_admin_auth(&headers)` helper.
+
+### 5. Testing Strategy
+- **Unit Tests**: Located in `src/models.rs` (mod tests). Cover validation logic and status parsing.
+- **Integration Tests**: Currently none. Focus on unit tests for logic.
+
+---
+
+## Code Style - TypeScript (UI)
+
+### 1. Stack & Architecture
+- **Framework**: Next.js 16 (App Router), React 19
+- **Styling**: Tailwind CSS + **Aurora Flow Design System**
+  - Colors: Deep Ocean (`#0A1929`), Hot Coral (`#FF6B6B`), Aurora Emerald (`#50C878`)
+  - Glassmorphism: `glass-aurora` utility class
+- **State**: React hooks (`useState`, `useCallback`) only. No Redux/Zustand.
+
+### 2. Imports Ordering
+1. React / Next.js (`import { useState } from 'react'`)
+2. External libraries (`import { MapPin } from 'lucide-react'`)
+3. Local components (`import { Header } from '@/components'`)
+4. Local utils/api (`import { fetchEvents } from '@/lib/api'`)
+5. Types (`import { Event } from '@/types'`)
+
+### 3. Component Pattern
+```typescript
+interface Props { event: Event; }
+export default function EventCard({ event }: Props) {
+    // 1. Hooks
+    const [isOpen, setIsOpen] = useState(false);
+    
+    // 2. Callbacks
+    const toggle = useCallback(() => setIsOpen(v => !v), []);
+
+    // 3. Effects
+    useEffect(() => { /* ... */ }, []);
+
+    // 4. Render
+    return <div className="card-aurora">{event.title}</div>;
+}
+```
+
+### 4. Data Fetching
+- Fetch from `process.env.NEXT_PUBLIC_API_URL`
+- Handle `image_url` and `video_url` logic:
+  - If both exist: Show Image in header, Video embed in content.
+  - If Image only: Show Image.
+  - If Video only: Show Video (or placeholder with icon).
 
 ---
 
 ## Do NOT
-
-- Use `as any` or `@ts-ignore` in TypeScript
-- Skip error handling with empty catch blocks
-- Hardcode API keys or secrets
-- Commit `.env` files or database files
-- Use `unwrap()` in Rust without explicit justification
+1. **Never commit .env files**.
+2. **Never** use `unwrap()` in server code (except tests).
+3. **Never** use `as any` in TypeScript.
+4. **Never** hardcode API keys. Use environment variables.
+5. **Never** leave empty catch blocks. Log the error.
