@@ -13,32 +13,29 @@ import {
     rejectSuggestion
 } from '@/lib/admin-api';
 import { AdminEventCard, EditEventModal, SuggestionCard } from '@/components/admin';
+import { AuroraBackground } from '@/components';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 type Tab = 'all' | 'pending' | 'approved' | 'rejected' | 'suggestions';
 
 export default function AdminPage() {
-    // Auth state
     const [adminKey, setAdminKey] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Data state
     const [events, setEvents] = useState<Event[]>([]);
     const [suggestions, setSuggestions] = useState<VideoSuggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // UI state
     const [currentTab, setCurrentTab] = useState<Tab>('all');
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
     const [toast, setToast] = useState<string | null>(null);
 
-    // Show toast message
     const showToast = useCallback((message: string) => {
         setToast(message);
         setTimeout(() => setToast(null), 3000);
     }, []);
 
-    // Load events
     const loadEvents = useCallback(async () => {
         if (!adminKey) {
             showToast('Please enter admin key');
@@ -62,7 +59,6 @@ export default function AdminPage() {
         }
     }, [adminKey, showToast]);
 
-    // Load suggestions when switching to suggestions tab
     const loadSuggestionsData = useCallback(async () => {
         if (!adminKey) return;
 
@@ -77,7 +73,6 @@ export default function AdminPage() {
         }
     }, [adminKey, showToast]);
 
-    // Handle tab switch
     const handleTabSwitch = useCallback((tab: Tab) => {
         setCurrentTab(tab);
         if (tab === 'suggestions') {
@@ -85,7 +80,6 @@ export default function AdminPage() {
         }
     }, [loadSuggestionsData]);
 
-    // Filter events by tab
     const filteredEvents = useMemo(() => {
         if (currentTab === 'all' || currentTab === 'suggestions') return events;
         return events.filter(e => {
@@ -94,7 +88,6 @@ export default function AdminPage() {
         });
     }, [events, currentTab]);
 
-    // Event actions
     const handleApproveEvent = useCallback(async (eventId: number) => {
         try {
             await approveEvent(adminKey, eventId);
@@ -127,7 +120,6 @@ export default function AdminPage() {
         }
     }, [adminKey, loadEvents, showToast]);
 
-    // Suggestion actions
     const handleApproveSuggestion = useCallback(async (suggestionId: number) => {
         try {
             await approveSuggestion(adminKey, suggestionId);
@@ -158,14 +150,15 @@ export default function AdminPage() {
 
     return (
         <div className="min-h-screen bg-[var(--color-background)] p-4 md:p-6">
-            <div className="max-w-5xl mx-auto">
-                {/* Header */}
+            <AuroraBackground />
+            <div className="max-w-5xl mx-auto relative z-10">
                 <header className="flex flex-wrap items-center justify-between gap-4 pb-6 mb-6 border-b border-white/10">
                     <div>
-                        <Link href="/" className="text-sm text-[var(--color-accent)] hover:underline mb-2 block">
-                            ← Back to Map
+                        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition-colors mb-2">
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to Map
                         </Link>
-                        <h1 className="text-2xl font-bold text-[var(--color-primary)]">
+                        <h1 className="text-2xl font-bold text-white">
                             Admin Panel
                         </h1>
                     </div>
@@ -176,29 +169,29 @@ export default function AdminPage() {
                             value={adminKey}
                             onChange={(e) => setAdminKey(e.target.value)}
                             placeholder="Enter Admin Key"
-                            className="px-4 py-2 rounded-lg bg-[var(--color-surface)] border border-white/10 text-[var(--color-text)] focus:border-[var(--color-accent)] outline-none"
+                            className="px-4 py-3 rounded-2xl input-aurora"
                             onKeyDown={(e) => e.key === 'Enter' && loadEvents()}
                         />
                         <button
                             onClick={loadEvents}
                             disabled={isLoading}
-                            className="px-5 py-2 rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white font-medium transition-colors disabled:opacity-50"
+                            className="px-6 py-3 btn-coral disabled:opacity-50 flex items-center gap-2"
                         >
+                            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                             {isLoading ? 'Loading...' : 'Load Events'}
                         </button>
                     </div>
                 </header>
 
-                {/* Tabs */}
                 {isAuthenticated && (
                     <div className="flex flex-wrap gap-2 mb-6">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => handleTabSwitch(tab.id)}
-                                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${currentTab === tab.id
-                                    ? 'bg-[var(--color-accent)] text-white'
-                                    : 'border border-white/10 text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+                                className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all ${currentTab === tab.id
+                                    ? 'btn-coral'
+                                    : 'bg-white/5 border border-white/10 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-white/10'
                                     }`}
                             >
                                 {tab.label}
@@ -207,14 +200,12 @@ export default function AdminPage() {
                     </div>
                 )}
 
-                {/* Error */}
                 {error && (
-                    <div className="mb-6 p-4 rounded-lg bg-red-500/20 text-red-400">
+                    <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400">
                         {error}
                     </div>
                 )}
 
-                {/* Content */}
                 {!isAuthenticated ? (
                     <div className="text-center py-16 text-[var(--color-text-muted)]">
                         <p>Enter admin key and click "Load Events" to manage events.</p>
@@ -260,7 +251,6 @@ export default function AdminPage() {
                 )}
             </div>
 
-            {/* Edit Modal */}
             {editingEvent && (
                 <EditEventModal
                     event={editingEvent}
@@ -273,9 +263,8 @@ export default function AdminPage() {
                 />
             )}
 
-            {/* Toast */}
             {toast && (
-                <div className="fixed bottom-6 right-6 px-6 py-3 rounded-lg bg-[var(--color-primary)] text-white font-medium shadow-lg animate-slide-up">
+                <div className="fixed bottom-6 right-6 px-6 py-3 btn-coral shadow-2xl animate-slide-up z-50">
                     {toast}
                 </div>
             )}

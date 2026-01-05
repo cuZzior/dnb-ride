@@ -4,16 +4,16 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Event, Filters } from '@/types';
 import { fetchEvents, calculateDistance } from '@/lib/api';
-import { Header, Sidebar, EventDetailPanel, SuggestVideoModal, Footer, AddEventModal } from '@/components';
-import { Bike, Loader2, AlertCircle, RefreshCw, Plus } from 'lucide-react';
+import { Header, Sidebar, EventDetailPanel, SuggestVideoModal, Footer, AddEventModal, AuroraBackground } from '@/components';
+import { Loader2, AlertCircle, RefreshCw, Plus } from 'lucide-react';
+import Image from 'next/image';
 
-// Dynamic import for Map to avoid SSR issues with Mapbox
 const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-[var(--color-surface)]">
+    <div className="w-full h-full flex items-center justify-center bg-[var(--color-background)]">
       <div className="text-center">
-        <Loader2 className="w-12 h-12 text-[var(--color-accent)] animate-spin mx-auto mb-4" />
+        <Loader2 className="w-12 h-12 text-[var(--color-primary)] animate-spin mx-auto mb-4" />
         <p className="text-[var(--color-text-muted)]">Loading map...</p>
       </div>
     </div>
@@ -21,18 +21,15 @@ const Map = dynamic(() => import('@/components/Map'), {
 });
 
 export default function HomePage() {
-  // Data state
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // UI state
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [showVideoModal, setShowVideoModal] = useState<number | null>(null);
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
-  // Filters - default to upcoming events
   const [filters, setFilters] = useState<Filters>({
     country: '',
     organizer: '',
@@ -41,7 +38,6 @@ export default function HomePage() {
     userLocation: null,
   });
 
-  // Fetch initial data
   useEffect(() => {
     async function loadData() {
       try {
@@ -57,29 +53,24 @@ export default function HomePage() {
     loadData();
   }, []);
 
-  // Filter and sort events
   const filteredEvents = useMemo(() => {
     let result = [...events];
     const now = new Date();
 
-    // Filter by time
     if (filters.timeFilter === 'upcoming') {
       result = result.filter(e => new Date(e.event_date) >= now);
     } else if (filters.timeFilter === 'past') {
       result = result.filter(e => new Date(e.event_date) < now);
     }
 
-    // Filter by country
     if (filters.country) {
       result = result.filter(e => e.country === filters.country);
     }
 
-    // Filter by organizer
     if (filters.organizer) {
       result = result.filter(e => e.organizer === filters.organizer);
     }
 
-    // Add distance if user location is available
     if (filters.userLocation) {
       result = result.map(event => ({
         ...event,
@@ -92,18 +83,14 @@ export default function HomePage() {
       }));
     }
 
-    // Sort by distance or date
     if (filters.sortByDistance && filters.userLocation) {
       result.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else {
-      // Sort by date
       if (filters.timeFilter === 'past') {
-        // Past: most recent first
         result.sort((a, b) =>
           new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
         );
       } else {
-        // Upcoming: soonest first
         result.sort((a, b) =>
           new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
         );
@@ -113,12 +100,10 @@ export default function HomePage() {
     return result;
   }, [events, filters]);
 
-  // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Partial<Filters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
   }, []);
 
-  // Handle "Near Me" button
   const handleNearMe = useCallback(() => {
     if (filters.sortByDistance) {
       handleFilterChange({ sortByDistance: false });
@@ -144,23 +129,25 @@ export default function HomePage() {
       },
       (error) => {
         console.error('Geolocation error:', error);
-        alert('Unable to get your location. Please check your permissions.');
+        alert('Error getting location: ' + error.message);
         setIsLoadingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
     );
   }, [filters.sortByDistance, handleFilterChange]);
 
-  // Handle event selection
   const handleEventSelect = useCallback((event: Event) => {
     setSelectedEventId(event.id);
   }, []);
 
-  // Handle video suggestion success
   const handleVideoSuggestionSuccess = useCallback(() => {
     alert('Video suggestion submitted! An admin will review it.');
   }, []);
 
-  // Get selected event
   const selectedEvent = useMemo(() =>
     filteredEvents.find(e => e.id === selectedEventId),
     [filteredEvents, selectedEventId]
@@ -169,11 +156,11 @@ export default function HomePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)]">
-        <div className="text-center">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] flex items-center justify-center mx-auto mb-6">
-            <Bike className="w-10 h-10 text-white" />
+        <AuroraBackground />
+        <div className="text-center relative z-10">
+          <div className="w-24 h-24 rounded-3xl overflow-hidden mx-auto mb-6 shadow-2xl">
+            <Image src="/logo.png" alt="DNBRIDE" width={96} height={96} className="object-cover" priority />
           </div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">DNB On The Bike</h1>
           <div className="flex items-center justify-center gap-2 text-[var(--color-text-muted)]">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Loading events...</span>
@@ -186,15 +173,16 @@ export default function HomePage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-background)]">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-8 h-8 text-red-400" />
+        <AuroraBackground />
+        <div className="text-center relative z-10">
+          <div className="w-20 h-20 rounded-2xl bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-red-400" />
           </div>
           <h1 className="text-2xl font-bold text-[var(--color-text)] mb-2">Oops!</h1>
           <p className="text-[var(--color-text-muted)] mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg btn-gradient"
+            className="inline-flex items-center gap-2 px-6 py-3 btn-coral"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
@@ -205,15 +193,15 @@ export default function HomePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden bg-[var(--color-background)]">
+      <AuroraBackground />
       <Header onAddEventClick={() => setShowAddEventModal(true)} />
 
       <main
         className="flex-1 flex flex-col md:flex-row overflow-hidden relative"
         style={{ marginTop: 'var(--header-height)' }}
       >
-        {/* Desktop: Sidebar on left */}
-        <div className="hidden md:block md:w-[var(--sidebar-width)] flex-shrink-0 md:h-full overflow-hidden">
+        <div className="hidden md:block md:w-[var(--sidebar-width)] flex-shrink-0 md:h-full overflow-hidden relative z-10">
           <Sidebar
             events={filteredEvents}
             allEvents={events}
@@ -226,8 +214,7 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Map - full height on mobile, flex-1 on desktop */}
-        <div className="flex-1 relative h-full">
+        <div className="flex-1 relative h-full z-[1]">
           <Map
             events={filteredEvents}
             selectedEventId={selectedEventId}
@@ -237,8 +224,7 @@ export default function HomePage() {
           <Footer />
         </div>
 
-        {/* Mobile: Bottom sheet with events */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-30">
+        <div className="md:hidden">
           <Sidebar
             events={filteredEvents}
             allEvents={events}
@@ -253,16 +239,15 @@ export default function HomePage() {
         </div>
       </main>
 
-      {/* FAB - Add Ride (Mobile) */}
       <button
         onClick={() => setShowAddEventModal(true)}
-        className="md:hidden fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full btn-gradient shadow-xl shadow-[var(--color-primary)]/30 flex items-center justify-center text-white animate-scale-in"
+        className="md:hidden fixed bottom-36 right-4 z-40 w-14 h-14 btn-coral flex items-center justify-center text-white animate-scale-in shadow-2xl"
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         aria-label="Add New Ride"
       >
-        <Plus className="w-8 h-8" />
+        <Plus className="w-7 h-7" />
       </button>
 
-      {/* Event Detail Modal */}
       {selectedEvent && (
         <EventDetailPanel
           event={selectedEvent}
@@ -271,7 +256,6 @@ export default function HomePage() {
         />
       )}
 
-      {/* Suggest Video Modal */}
       {showVideoModal !== null && (
         <SuggestVideoModal
           eventId={showVideoModal}
@@ -280,13 +264,11 @@ export default function HomePage() {
         />
       )}
 
-      {/* Add AddEventModal */}
       {showAddEventModal && (
         <AddEventModal
           onClose={() => setShowAddEventModal(false)}
           onSuccess={() => {
             setShowAddEventModal(false);
-            // In a real app we might refetch, but here we can rely on manual refresh or add an onRefresh callback to page
             window.location.reload();
           }}
         />

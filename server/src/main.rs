@@ -2,10 +2,10 @@ mod db;
 mod models;
 mod routes;
 
-use axum::{http, routing::get, Router};
+use axum::{routing::get, Router};
 use sqlx::sqlite::SqlitePoolOptions;
 use std::sync::Arc;
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 pub struct AppState {
@@ -40,7 +40,9 @@ async fn main() -> anyhow::Result<()> {
         .await?;
 
     // Run migrations
-    db::init_db(&pool).await?;
+    sqlx::migrate!().run(&pool).await?;
+
+    db::seed_sample_data(&pool).await?;
 
     let state = Arc::new(AppState { db: pool });
 
@@ -65,7 +67,7 @@ async fn main() -> anyhow::Result<()> {
     let addr = format!("0.0.0.0:{}", port);
 
     let listener = tokio::net::TcpListener::bind(&addr).await?;
-    tracing::info!("DNB On The Bike API running on http://localhost:{}", port);
+    tracing::info!("DNB RIDE API running on http://localhost:{}", port);
 
     axum::serve(listener, app).await?;
     Ok(())

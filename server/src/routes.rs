@@ -52,7 +52,8 @@ pub fn admin_router() -> Router<Arc<AppState>> {
         .route("/events", get(list_all_events))
         .route("/events/pending", get(list_pending_events))
         .nest("/suggestions", admin_suggestions_router())
-        .route("/events/:id", put(update_event).delete(delete_event))
+        .route("/events/:id", put(update_event))
+        .route("/events/:id", delete(delete_event))
         .route("/events/:id/approve", patch(approve_event))
         .route("/events/:id/reject", patch(reject_event))
 }
