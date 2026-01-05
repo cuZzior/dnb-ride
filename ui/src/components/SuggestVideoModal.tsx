@@ -46,27 +46,27 @@ export default function SuggestVideoModal({ eventId, onClose, onSuccess }: Sugge
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
             <div
-                className="bg-[var(--color-surface)] w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-slide-up border border-white/10"
+                className="glass-aurora w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-slide-up"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-white/10">
-                    <div className="flex items-center gap-2">
-                        <Video className="w-5 h-5 text-[var(--color-accent)]" />
+                <div className="flex items-center justify-between p-5 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)]/20 flex items-center justify-center">
+                            <Video className="w-5 h-5 text-[var(--color-primary)]" />
+                        </div>
                         <h3 className="text-lg font-semibold text-[var(--color-text)]">
                             Suggest a Video
                         </h3>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-[var(--color-text-muted)]"
+                        className="w-9 h-9 rounded-full hover:bg-white/10 flex items-center justify-center text-[var(--color-text-muted)]"
                     >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
                         <label
                             htmlFor="videoUrl"
@@ -80,7 +80,7 @@ export default function SuggestVideoModal({ eventId, onClose, onSuccess }: Sugge
                             value={videoUrl}
                             onChange={(e) => setVideoUrl(e.target.value)}
                             placeholder="https://www.youtube.com/watch?v=..."
-                            className="w-full px-4 py-3 rounded-lg bg-[var(--color-background)] border border-white/10 text-[var(--color-text)] placeholder-[var(--color-text-muted)]/50 focus:border-[var(--color-accent)] outline-none"
+                            className="w-full px-4 py-3.5 input-aurora"
                             disabled={isSubmitting}
                         />
                     </div>
@@ -99,14 +99,14 @@ export default function SuggestVideoModal({ eventId, onClose, onSuccess }: Sugge
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 rounded-lg border border-white/20 text-[var(--color-text)] font-medium hover:bg-white/5 transition-colors"
+                            className="flex-1 px-4 py-3.5 rounded-full border border-white/20 text-[var(--color-text)] font-medium hover:bg-white/5 transition-colors"
                             disabled={isSubmitting}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg btn-gradient disabled:opacity-50"
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3.5 btn-coral disabled:opacity-50"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? (

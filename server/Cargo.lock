@@ -353,7 +353,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dnb-on-bike-api"
+name = "dnb-ride-api"
 version = "0.1.0"
 dependencies = [
  "anyhow",

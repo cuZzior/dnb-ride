@@ -6,7 +6,7 @@ import { MapPin, Clock, User, Play, Calendar } from 'lucide-react';
 
 interface EventCardProps {
     event: Event;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent) => void;
     isSelected?: boolean;
     compact?: boolean;
 }
@@ -28,15 +28,14 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
         return (
             <article
                 className={`
-                    flex-shrink-0 w-64 rounded-xl overflow-hidden cursor-pointer card-hover
-                    bg-[var(--color-surface-light)] border border-white/5
-                    ${isSelected ? 'ring-2 ring-[var(--color-accent)] border-transparent' : ''}
-                    ${isPast ? 'opacity-60' : ''}
+                    flex-shrink-0 w-64 rounded-3xl overflow-hidden cursor-pointer card-aurora
+                    glass-aurora-light
+                    ${isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''}
                 `}
                 onClick={onClick}
             >
                 <div className="flex h-20">
-                    <div className="relative w-20 h-full flex-shrink-0 bg-[var(--color-surface)]">
+                    <div className="relative w-20 h-full flex-shrink-0 bg-white/5">
                         {event.image_url ? (
                             <Image
                                 src={event.image_url}
@@ -46,7 +45,7 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
                                 sizes="80px"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20">
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--aurora-purple)]/20">
                                 <Calendar className="w-5 h-5 text-[var(--color-text-muted)]" />
                             </div>
                         )}
@@ -56,7 +55,7 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
                             </div>
                         )}
                     </div>
-                    <div className="flex-1 p-2 flex flex-col justify-center min-w-0">
+                    <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0">
                         <h3 className="text-xs font-semibold text-[var(--color-text)] line-clamp-1 mb-1">
                             {event.title}
                         </h3>
@@ -77,81 +76,80 @@ export default function EventCard({ event, onClick, isSelected, compact = false 
     return (
         <article
             className={`
-        rounded-xl overflow-hidden cursor-pointer card-hover
-        bg-[var(--color-surface-light)] border border-white/5
-        ${isSelected ? 'ring-2 ring-[var(--color-accent)] border-transparent' : ''}
-        ${isPast ? 'opacity-60' : ''}
-      `}
+                rounded-2xl overflow-hidden cursor-pointer card-aurora p-3
+                glass-aurora-light
+                ${isSelected ? 'ring-2 ring-[var(--color-primary)]' : ''}
+            `}
             onClick={onClick}
         >
-            {/* Event Image */}
-            <div className="relative h-28 bg-[var(--color-surface)]">
-                {event.image_url ? (
-                    <Image
-                        src={event.image_url}
-                        alt={event.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 400px"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20">
-                        <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] flex items-center justify-center">
-                            <Calendar className="w-6 h-6 text-[var(--color-text-muted)]" />
+            <div className="flex gap-3">
+                {event.image_url && (
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
+                        <Image
+                            src={event.image_url}
+                            alt={event.title}
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                        />
+                        {event.video_url && (
+                            <div className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                <Play className="w-2.5 h-2.5 text-white fill-white" />
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="text-sm font-semibold text-[var(--color-text)] line-clamp-1">
+                            {event.title}
+                        </h3>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                            {isPast && (
+                                <span className="px-2 py-0.5 rounded-full bg-white/10 text-[10px] text-[var(--color-text-muted)]">
+                                    Past
+                                </span>
+                            )}
+                            {event.video_url && !event.image_url && (
+                                <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                                    <Play className="w-2.5 h-2.5 text-white fill-white" />
+                                </div>
+                            )}
                         </div>
                     </div>
-                )}
 
-                {/* Date badge */}
-                <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-black/60 backdrop-blur text-xs font-medium text-white">
-                    {formattedDate}
-                </div>
-
-                {/* Past event badge */}
-                {isPast && (
-                    <div className="absolute top-2 right-2 px-2 py-1 rounded-md bg-[var(--color-surface)]/80 backdrop-blur text-xs text-[var(--color-text-muted)]">
-                        Past
-                    </div>
-                )}
-
-                {/* Video indicator */}
-                {event.video_url && (
-                    <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white fill-white" />
-                    </div>
-                )}
-            </div>
-
-            {/* Event Details */}
-            <div className="p-3">
-                <h3 className="text-sm font-semibold text-[var(--color-text)] line-clamp-1 mb-2">
-                    {event.title}
-                </h3>
-
-                <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-muted)] mb-1.5">
-                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className="line-clamp-1">{event.location_name}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5 text-[var(--color-text-muted)]">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{formattedTime}</span>
+                    <div className="flex items-center gap-3 text-xs text-[var(--color-text-muted)] mb-1">
+                        <div className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                            <span>{formattedDate}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-[var(--aurora-emerald)]" />
+                            <span>{formattedTime}</span>
+                        </div>
                     </div>
 
-                    {event.distance !== undefined && (
-                        <span className="text-[var(--color-accent)] font-medium">
-                            {event.distance.toFixed(1)} km
-                        </span>
+                    <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1 text-[var(--color-text-muted)] min-w-0">
+                            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[var(--color-primary)]" />
+                            <span className="line-clamp-1">{event.location_name}</span>
+                        </div>
+
+                        {event.distance !== undefined && (
+                            <span className="text-[var(--aurora-emerald)] font-medium flex-shrink-0 ml-2">
+                                {event.distance.toFixed(1)} km
+                            </span>
+                        )}
+                    </div>
+
+                    {event.organizer && (
+                        <div className="flex items-center gap-1 text-xs text-[var(--color-text-muted)] mt-1.5 pt-1.5 border-t border-white/5">
+                            <User className="w-3 h-3 flex-shrink-0" />
+                            <span className="line-clamp-1">{event.organizer}</span>
+                        </div>
                     )}
                 </div>
-
-                {event.organizer && (
-                    <div className="mt-2 pt-2 border-t border-white/5 flex items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
-                        <User className="w-3.5 h-3.5" />
-                        <span className="line-clamp-1">{event.organizer}</span>
-                    </div>
-                )}
             </div>
         </article>
     );

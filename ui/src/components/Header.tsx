@@ -13,31 +13,25 @@ export default function Header({ onAddEventClick }: HeaderProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 glass" style={{ height: 'var(--header-height)', paddingTop: 'var(--safe-area-top)' }}>
+        <header className="fixed top-0 left-0 right-0 z-50 glass-aurora" style={{ height: 'var(--header-height)', paddingTop: 'var(--safe-area-top)' }}>
             <div className="h-full flex items-center justify-between px-4 max-w-screen-2xl mx-auto">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-3">
-                    <div className="relative w-9 h-9 rounded-lg overflow-hidden">
+                <Link href="/" className="flex items-center">
+                    <div className="relative w-10 h-10 rounded-xl overflow-hidden">
                         <Image
                             src="/logo.png"
-                            alt="DnB On The Bike"
+                            alt="DNBRIDE"
                             fill
-                            className="object-cover"
+                            className="object-contain"
                         />
                     </div>
-                    <span className="text-lg font-bold">
-                        <span className="text-[var(--color-text)]">DnB </span>
-                        <span className="gradient-text">On The Bike</span>
-                    </span>
                 </Link>
 
-                {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-4">
-                    <Link href="/admin" className="px-3 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">
+                    <Link href="/admin" className="px-4 py-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors rounded-full hover:bg-white/5">
                         Admin
                     </Link>
                     <button
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg btn-gradient text-sm"
+                        className="flex items-center gap-2 px-5 py-2.5 btn-coral text-sm"
                         onClick={onAddEventClick}
                     >
                         <Plus className="w-4 h-4" />
@@ -45,28 +39,26 @@ export default function Header({ onAddEventClick }: HeaderProps) {
                     </button>
                 </nav>
 
-                {/* Mobile Menu Toggle */}
                 <button
-                    className="md:hidden p-2 text-[var(--color-text)] hover:bg-white/5 rounded-lg transition-colors"
+                    className="md:hidden p-2 text-[var(--color-text)] hover:bg-white/5 rounded-xl transition-colors"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 >
                     {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
             </div>
 
-            {/* Mobile Menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden glass border-t border-white/5 animate-slide-up">
+                <div className="md:hidden glass-aurora border-t border-white/5 animate-slide-up">
                     <nav className="flex flex-col p-4 gap-2">
                         <Link
                             href="/admin"
-                            className="px-4 py-3 rounded-lg hover:bg-white/5 text-[var(--color-text)] font-medium"
+                            className="px-4 py-3 rounded-2xl hover:bg-white/5 text-[var(--color-text)] font-medium"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             Admin
                         </Link>
                         <button
-                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg btn-gradient text-white font-medium mt-2"
+                            className="flex items-center justify-center gap-2 px-4 py-3 btn-coral text-white font-medium mt-2"
                             onClick={() => {
                                 setMobileMenuOpen(false);
                                 onAddEventClick();

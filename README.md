@@ -1,7 +1,7 @@
-# DnB On The Bike - Project Documentation
+# DNBRIDE - Project Documentation
 
-**Current State:** Sprint 4 Completed (January 2026)
-**Description:** A global discovery platform for Drum & Bass cycling events ("DnB On The Bike").
+**Current State:** Sprint 5 - Aurora Flow Rebrand (January 2026)
+**Description:** A global discovery platform for Drum & Bass cycling events.
 
 ## Quick Start
 
@@ -73,9 +73,11 @@ The project is a monorepo-style structure:
 **Frontend:**
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS + Custom Glassmorphism (CSS Variables)
-- **Map:** Mapbox GL JS
+- **Styling:** Tailwind CSS + Aurora Flow Design System
+- **Map:** Mapbox GL JS (Custom Aurora Dark Style)
 - **Icons:** Lucide React
+- **UI Components:** Vaul (gesture-based drawers)
+- **Font:** Outfit (Google Fonts)
 - **PWA:** Manifest, Meta tags configured
 
 **Backend:**
@@ -84,6 +86,18 @@ The project is a monorepo-style structure:
 - **Database:** SQLite (via SQLx)
 - **Runtime:** Tokio
 - **Validation:** Validator crate
+
+### Design System: Aurora Flow 2026
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Deep Ocean | `#0A1929` | Background |
+| Hot Coral | `#FF6B6B` | Primary accent |
+| Aurora Emerald | `#50C878` | Success states |
+| Aurora Blue | `#4169E1` | Info/links |
+| Aurora Purple | `#9D4EDD` | Highlights |
+| Card Radius | `24px` | All cards |
+| Button Radius | `50px` | Pill buttons |
 
 ---
 
@@ -171,14 +185,16 @@ NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
 
 ## UI Features
 
-- **Interactive Map:** Displays events with global pins. Pins highlight on selection.
+- **Interactive Map:** Custom Aurora-styled dark map with pulsing coral markers
 - **Sidebar Filtering:**
-  - **Time:** Upcoming / Past events status.
-  - **Country:** Filters events based on the `country` column.
-  - **Organizer:** Filter by specific organizer.
-  - **Near Me:** Sorts events by distance to user's geolocation.
-- **Event Details:** Modal with YouTube embed, directions, and external links.
-- **Video Suggestions:** Users can suggest videos for past events.
-- **Admin Panel:** `/admin` route for managing events and suggestions.
-- **PWA:** Installable on mobile, optimized viewport/safe-areas.
-- **UI:** Dark mode, glassmorphism aesthetics, vibrant pink/cyan palette.
+  - **Time:** Upcoming / Past events status
+  - **Country:** Filters events based on the `country` column
+  - **Organizer:** Filter by specific organizer
+  - **Near Me:** Sorts events by distance to user's geolocation
+- **Mobile Drawer:** Gesture-based bottom sheet (Vaul) for mobile UX
+- **Event Details:** Panel with YouTube embed, directions, and external links
+- **Video Suggestions:** Users can suggest videos for past events
+- **Admin Panel:** `/admin` route for managing events and suggestions
+- **Aurora Background:** Animated gradient blobs for visual depth
+- **PWA:** Installable on mobile, optimized viewport/safe-areas
+- **UI:** Aurora Flow 2026 design - glassmorphism, organic gradients, fluid motion

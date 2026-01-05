@@ -1,19 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-outfit",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "DnB On The Bike - Drum & Bass Cycling Events Worldwide",
+  title: "DNBRIDE - Drum & Bass Cycling Events Worldwide",
   description: "Discover and join Drum & Bass cycling events happening around the world. Find rides near you, suggest videos, and connect with the global DNB community.",
-  keywords: ["drum and bass", "cycling", "events", "DNB", "bike rides", "music", "community"],
-  authors: [{ name: "DnB On The Bike" }],
+  keywords: ["drum and bass", "cycling", "events", "DNB", "bike rides", "music", "community", "DNBRIDE"],
+  authors: [{ name: "DNBRIDE" }],
   openGraph: {
-    title: "DnB On The Bike",
+    title: "DNBRIDE",
     description: "Drum & Bass Cycling Events Worldwide",
     type: "website",
   },
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "DnB On The Bike",
+    title: "DNBRIDE",
   },
 };
 
@@ -31,7 +33,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#ff3b5c",
+  themeColor: "#FF6B6B",
 };
 
 export default function RootLayout({
@@ -41,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${outfit.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>
