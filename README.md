@@ -1,6 +1,6 @@
 # DNBRIDE - Project Documentation
 
-**Current State:** Sprint 5 - Aurora Flow Rebrand (January 2026)
+**Current State:** Sprint 6 - Media & Features Polish (January 2026)
 **Description:** A global discovery platform for Drum & Bass cycling events.
 
 ## Quick Start
@@ -86,6 +86,7 @@ The project is a monorepo-style structure:
 - **Database:** SQLite (via SQLx)
 - **Runtime:** Tokio
 - **Validation:** Validator crate
+- **Testing:** Built-in Cargo test framework
 
 ### Design System: Aurora Flow 2026
 
@@ -144,9 +145,9 @@ NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
 - `latitude`: REAL
 - `longitude`: REAL
 - `event_date`: DATETIME
-- `image_url`: TEXT
-- `video_url`: TEXT (YouTube link for past events)
-- `event_link`: TEXT (External event page)
+- `image_url`: TEXT (Optional, nullable)
+- `video_url`: TEXT (Optional, nullable - YouTube link)
+- `event_link`: TEXT (Optional, nullable - External event page)
 - `status`: TEXT (pending, approved, rejected)
 
 **`organizers` Table**
@@ -173,7 +174,7 @@ NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
 
 **Admin (Requires `X-Admin-Key` header):**
 - `GET /api/admin/events` - List all events (including pending/rejected)
-- `PUT /api/admin/events/:id` - Update event details
+- `PUT /api/admin/events/:id` - Update event details (allows clearing fields with empty strings)
 - `PATCH /api/admin/events/:id/approve` - Approve event
 - `PATCH /api/admin/events/:id/reject` - Reject event
 - `DELETE /api/admin/events/:id` - Delete event
@@ -190,11 +191,12 @@ NEXT_PUBLIC_MAPBOX_TOKEN=pk.your_mapbox_token_here
   - **Time:** Upcoming / Past events status
   - **Country:** Filters events based on the `country` column
   - **Organizer:** Filter by specific organizer
-  - **Near Me:** Sorts events by distance to user's geolocation
-- **Mobile Drawer:** Gesture-based bottom sheet (Vaul) for mobile UX
-- **Event Details:** Panel with YouTube embed, directions, and external links
+  - **Near Me:** Sorts events by distance to user's geolocation (Improved error handling)
+- **Mobile Drawer:** Gesture-based bottom sheet (Vaul) for mobile UX (Optimized layout)
+- **Event Details:** Panel displaying BOTH image header and YouTube embed (if available)
+- **Add Ride:** User submission form now includes Image URL and YouTube URL fields
 - **Video Suggestions:** Users can suggest videos for past events
-- **Admin Panel:** `/admin` route for managing events and suggestions
+- **Admin Panel:** `/admin` route for managing events (Edit modal allows clearing URL fields)
 - **Aurora Background:** Animated gradient blobs for visual depth
 - **PWA:** Installable on mobile, optimized viewport/safe-areas
 - **UI:** Aurora Flow 2026 design - glassmorphism, organic gradients, fluid motion
