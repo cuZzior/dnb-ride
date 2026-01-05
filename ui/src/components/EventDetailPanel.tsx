@@ -39,17 +39,7 @@ export default function EventDetailPanel({ event, onClose, onSuggestVideo }: Eve
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="relative h-48 md:h-64 bg-[var(--color-background)]">
-                    {embedUrl ? (
-                        <iframe
-                            src={embedUrl}
-                            className="w-full h-full"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-                            referrerPolicy="strict-origin-when-cross-origin"
-                            allowFullScreen
-                            title={event.title}
-                        />
-                    ) : event.image_url ? (
+                    {event.image_url ? (
                         <Image
                             src={event.image_url}
                             alt={event.title}
@@ -65,13 +55,13 @@ export default function EventDetailPanel({ event, onClose, onSuggestVideo }: Eve
 
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur flex items-center justify-center text-white hover:bg-black/70 transition-colors z-10"
                     >
                         <X className="w-5 h-5" />
                     </button>
 
                     {isPast && (
-                        <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur text-sm text-[var(--color-text-muted)]">
+                        <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur text-sm text-[var(--color-text-muted)] z-10">
                             Past Event
                         </div>
                     )}
@@ -81,6 +71,20 @@ export default function EventDetailPanel({ event, onClose, onSuggestVideo }: Eve
                     <h2 className="text-2xl font-bold text-[var(--color-text)] mb-4">
                         {event.title}
                     </h2>
+
+                    {embedUrl && (
+                        <div className="mb-6 rounded-2xl overflow-hidden shadow-lg aspect-video bg-black/20">
+                            <iframe
+                                src={embedUrl}
+                                className="w-full h-full"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                allowFullScreen
+                                title={event.title}
+                            />
+                        </div>
+                    )}
 
                     <div className="space-y-3 mb-6">
                         <div className="flex items-center gap-3 text-[var(--color-text-muted)]">

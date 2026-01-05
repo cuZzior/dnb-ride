@@ -136,11 +136,9 @@ pub struct UpdateEventRequest {
     #[validate(range(min = -180.0, max = 180.0))]
     pub longitude: Option<f64>,
     pub event_date: Option<DateTime<Utc>>,
-    #[validate(url)]
+    // Allow empty string to clear the field (handled in routes.rs)
     pub image_url: Option<String>,
-    #[validate(url)]
     pub video_url: Option<String>,
-    #[validate(url)]
     pub event_link: Option<String>,
     pub status: Option<String>,
 }

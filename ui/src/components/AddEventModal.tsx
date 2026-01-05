@@ -30,7 +30,8 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
         event_time: '',
         description: '',
         event_link: '',
-        image_url: ''
+        image_url: '',
+        video_url: ''
     });
 
     const mapContainer = useRef<HTMLDivElement>(null);
@@ -172,7 +173,7 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
                 event_date: dateTime.toISOString(),
                 event_link: formData.event_link || null,
                 image_url: formData.image_url || null,
-                video_url: null
+                video_url: formData.video_url || null
             };
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
@@ -255,21 +256,22 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
-                                    Organizer *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="organizer"
-                                    required
-                                    value={formData.organizer}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Dom Whiting"
-                                    className="w-full px-4 py-3 input-aurora"
-                                />
-                            </div>
+                        <div>
+                            <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
+                                Organizer *
+                            </label>
+                            <input
+                                type="text"
+                                name="organizer"
+                                required
+                                value={formData.organizer}
+                                onChange={handleChange}
+                                placeholder="e.g. Dom Whiting"
+                                className="w-full px-4 py-3 input-aurora"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
                                     Date *
@@ -283,9 +285,6 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
                                     className="w-full px-4 py-3 input-aurora"
                                 />
                             </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
                                     Start Time *
@@ -299,20 +298,21 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
                                     className="w-full px-4 py-3 input-aurora"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
-                                    City/Location *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="location_name"
-                                    required
-                                    value={formData.location_name}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Hyde Park"
-                                    className="w-full px-4 py-3 input-aurora"
-                                />
-                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
+                                Location Name *
+                            </label>
+                            <input
+                                type="text"
+                                name="location_name"
+                                required
+                                value={formData.location_name}
+                                onChange={handleChange}
+                                placeholder="e.g. Hyde Park"
+                                className="w-full px-4 py-3 input-aurora"
+                            />
                         </div>
 
                         <div>
@@ -362,7 +362,7 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
 
                         <div>
                             <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
-                                Event Link (FB/RA)
+                                Event Link
                             </label>
                             <input
                                 type="url"
@@ -384,6 +384,20 @@ export default function AddEventModal({ onClose, onSuccess }: AddEventModalProps
                                 value={formData.image_url}
                                 onChange={handleChange}
                                 placeholder="https://..."
+                                className="w-full px-4 py-3 input-aurora"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-[var(--color-text-muted)] uppercase mb-2">
+                                YouTube URL (Optional)
+                            </label>
+                            <input
+                                type="url"
+                                name="video_url"
+                                value={formData.video_url}
+                                onChange={handleChange}
+                                placeholder="https://youtube.com/watch?v=..."
                                 className="w-full px-4 py-3 input-aurora"
                             />
                         </div>
