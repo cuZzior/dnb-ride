@@ -90,7 +90,7 @@ pub struct OrganizersResponse {
 }
 
 /// Request body for creating a new event
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, Clone)]
 pub struct CreateEventRequest {
     #[validate(length(min = 3))]
     pub title: String,
@@ -169,4 +169,79 @@ pub struct CreateSuggestionRequest {
 pub struct SuggestionsResponse {
     pub suggestions: Vec<VideoSuggestion>,
     pub total: usize,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+
+    #[test]
+    fn test_event_status_parsing() {
+        assert_eq!(EventStatus::from("approved".to_string()), EventStatus::Approved);
+        assert_eq!(EventStatus::from("Approved".to_string()), EventStatus::Approved);
+        assert_eq!(EventStatus::from("APPROVED".to_string()), EventStatus::Approved);
+        assert_eq!(EventStatus::from("rejected".to_string()), EventStatus::Rejected);
+        assert_eq!(EventStatus::from("pending".to_string()), EventStatus::Pending);
+        assert_eq!(EventStatus::from("unknown".to_string()), EventStatus::Pending);
+        assert_eq!(EventStatus::from("".to_string()), EventStatus::Pending);
+    }
+
+    #[test]
+    fn test_event_status_to_string() {
+        assert_eq!(EventStatus::Approved.to_string(), "approved");
+        assert_eq!(EventStatus::Rejected.to_string(), "rejected");
+        assert_eq!(EventStatus::Pending.to_string(), "pending");
+    }
+
+    #[test]
+    fn test_create_event_request_validation() {
+        let valid_request = CreateEventRequest {
+            title: "Valid Title".to_string(),
+            description: None,
+            organizer: "Organizer".to_string(),
+            location_name: "Location".to_string(),
+            country: Some("Country".to_string()),
+            latitude: 50.0,
+            longitude: 10.0,
+            event_date: Utc::now(),
+            image_url: Some("https://example.com/image.jpg".to_string()),
+            video_url: None,
+            event_link: None,
+        };
+        assert!(valid_request.validate().is_ok());
+
+        let invalid_title = CreateEventRequest {
+            title: "No".to_string(),
+            ..valid_request.clone()
+        };
+        assert!(invalid_title.validate().is_err());
+
+        let invalid_coords = CreateEventRequest {
+            latitude: 100.0,
+            ..valid_request.clone()
+        };
+        assert!(invalid_coords.validate().is_err());
+
+        let invalid_url = CreateEventRequest {
+            image_url: Some("not-a-url".to_string()),
+            ..valid_request.clone()
+        };
+        assert!(invalid_url.validate().is_err());
+    }
+
+    #[test]
+    fn test_create_suggestion_request_validation() {
+        let valid = CreateSuggestionRequest {
+            event_id: 1,
+            video_url: "https://youtube.com/watch?v=123".to_string(),
+        };
+        assert!(valid.validate().is_ok());
+
+        let invalid = CreateSuggestionRequest {
+            event_id: 1,
+            video_url: "not-a-url".to_string(),
+        };
+        assert!(invalid.validate().is_err());
+    }
 }
