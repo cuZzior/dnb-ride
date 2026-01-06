@@ -50,7 +50,7 @@ export default function Sidebar({
                 onClick={() => onFilterChange({ timeFilter: 'upcoming' })}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                     filters.timeFilter === 'upcoming'
-                        ? 'btn-coral'
+                        ? 'bg-white/10 text-white'
                         : 'bg-white/5 text-[var(--color-text-muted)] hover:bg-white/10'
                 }`}
             >
